@@ -12,9 +12,19 @@ import 'speed_dial_direction.dart';
 
 typedef AsyncChildrenBuilder = Future<List<SpeedDialChild>> Function(
     BuildContext context);
+class SpeedDialController {
+  void Function(bool value)? _getToggle;
 
+  SpeedDialController();
+
+  set setToggle(bool value) {
+    _getToggle!(value);
+  }
+}
 /// Builds the Speed Dial
 class SpeedDial extends StatefulWidget {
+  final SpeedDialController controller;
+
   /// Children buttons, from the lowest to the highest.
   final List<SpeedDialChild> children;
 
@@ -217,7 +227,7 @@ class SpeedDial extends StatefulWidget {
     this.childPadding = const EdgeInsets.symmetric(vertical: 5),
     this.spaceBetweenChildren,
     this.spacing,
-    this.animationCurve,
+    this.animationCurve, required this.controller,
   }) : super(key: key);
 
   @override
@@ -239,6 +249,9 @@ class _SpeedDialState extends State<SpeedDial>
   @override
   void initState() {
     super.initState();
+    widget.controller._getToggle = (value) {
+      _toggleChildren();
+    };
     widget.openCloseDial?.addListener(_onOpenCloseDial);
     Future.delayed(Duration.zero, () async {
       if (mounted && widget.isOpenOnStart) _toggleChildren();
